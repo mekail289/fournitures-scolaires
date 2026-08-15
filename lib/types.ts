@@ -1,4 +1,4 @@
-export type Level="2e année"|"4e année"|"6e année";
+export type Level="2e année"|"4e année"|"6e année"|"Extras";
 export type Status="À acheter"|"J’en ai déjà"|"Réservé"|"Commandé"|"Acheté"|"Introuvable"|"À vérifier";
 export type Supply={id:string;level:Level;name:string;quantity:number;owned?:number;color?:string;format?:string;requirements?:string;mandatoryMerchant?:MerchantId;status:Status};
 export type Inventory={id:string;name:string;quantity:number;color?:string;format?:string;note?:string};
