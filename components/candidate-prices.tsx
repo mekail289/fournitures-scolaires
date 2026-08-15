@@ -1,0 +1,10 @@
+"use client";
+import {merchants} from "@/lib/seed";
+import type {AppState,Price} from "@/lib/types";
+const money=(n:number)=>new Intl.NumberFormat("fr-CA",{style:"currency",currency:"CAD"}).format(n);
+export default function CandidatePrices({state,setState}:{state:AppState;setState:React.Dispatch<React.SetStateAction<AppState>>}){
+ const candidates=state.prices.filter(p=>p.matchStatus==="candidate");
+ const decide=(price:Price,accepted:boolean)=>setState(s=>({...s,prices:s.prices.map(p=>p===price?{...p,matchStatus:accepted?"verified":"rejected",verifiedAt:accepted?new Date().toISOString():undefined}:p)}));
+ if(!candidates.length)return null;
+ return <><h2>Articles proposés à confirmer</h2><div className="notice">Une caractéristique peut différer. Ces produits ne comptent pas dans le calcul avant votre approbation.</div>{candidates.map(p=>{const x=state.items.find(i=>i.id===p.itemId),m=merchants.find(x=>x.id===p.merchantId);return <div className="card" key={`${p.itemId}-${p.merchantId}`}><strong>{x?.name}{x?.color?` — ${x.color}`:""}</strong><div className="muted">Demandé : {[x?.format,x?.requirements].filter(Boolean).join(" · ")||"format courant"}</div><div style={{marginTop:10}}><b>Proposé chez {m?.name} :</b> {p.productName}</div><div>{money(p.packagePrice)} pour {p.packageQuantity}</div>{p.matchNote&&<div className="notice" style={{marginTop:10}}>{p.matchNote}</div>}<div className="row" style={{marginTop:12}}><button onClick={()=>decide(p,true)}>Oui, utiliser</button><button className="ghost" onClick={()=>decide(p,false)}>Non</button>{p.sourceUrl&&<a href={p.sourceUrl} target="_blank" rel="noreferrer">Voir le produit</a>}</div></div>})}</>;
+}
