@@ -1,0 +1,4 @@
+import type {MerchantId} from "./types";
+export type ProductSearch={query:string;color?:string;format?:string}; export type ProductResult={id:string;name:string,url?:string}; export type PriceResult={price:number,currency:"CAD",checkedAt:string}; export type AvailabilityResult={available:boolean,note?:string};
+export interface MerchantProvider{merchantId:MerchantId;searchProducts(query:ProductSearch):Promise<ProductResult[]>;getPrice(productId:string,locationId?:string):Promise<PriceResult>;getAvailability(productId:string,locationId?:string):Promise<AvailabilityResult>;getPromotions():Promise<unknown[]>}
+export class ManualMerchantProvider implements MerchantProvider{constructor(public merchantId:MerchantId){}async searchProducts(){return[]}async getPrice(){throw new Error("Prix à saisir manuellement") }async getAvailability(){return{available:true,note:"À confirmer"}}async getPromotions(){return[]}}

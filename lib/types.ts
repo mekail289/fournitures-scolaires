@@ -1,0 +1,9 @@
+export type Level="2e année"|"4e année"|"6e année";
+export type Status="À acheter"|"J’en ai déjà"|"Réservé"|"Commandé"|"Acheté"|"Introuvable"|"À vérifier";
+export type Supply={id:string;level:Level;name:string;quantity:number;color?:string;format?:string;requirements?:string;mandatoryMerchant?:MerchantId;status:Status};
+export type Inventory={id:string;name:string;quantity:number;color?:string;format?:string;note?:string};
+export type MerchantId="jean-coutu"|"bureau-en-gros"|"commande-scolaire";
+export type Price={itemId:string;merchantId:MerchantId;packagePrice:number;packageQuantity:number;available:boolean};
+export type PlanLine={item:Supply;merchantId:MerchantId;packages:number;cost:number;needed:number;checked?:boolean};
+export type Strategy="cheap"|"few"|"balanced";
+export type AppState={items:Supply[];inventory:Inventory[];prices:Price[];selectedMerchants:MerchantId[];coupon:{active:boolean;value:number;expires?:string};plan:PlanLine[];history:{date:string;label:string;amount:number}[]};
