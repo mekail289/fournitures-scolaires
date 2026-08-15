@@ -6,4 +6,5 @@ export type MerchantId="jean-coutu"|"bureau-en-gros"|"commande-scolaire";
 export type Price={itemId:string;merchantId:MerchantId;packagePrice:number;packageQuantity:number;available:boolean};
 export type PlanLine={item:Supply;merchantId:MerchantId;packages:number;cost:number;needed:number;checked?:boolean};
 export type Strategy="cheap"|"few"|"balanced";
-export type AppState={items:Supply[];inventory:Inventory[];prices:Price[];selectedMerchants:MerchantId[];coupon:{active:boolean;value:number;expires?:string};plan:PlanLine[];history:{date:string;label:string;amount:number}[]};
+export type Promotion={merchantId:MerchantId;code:string;active:boolean;kind:"fixed"|"percent";value:number;expires?:string};
+export type AppState={items:Supply[];inventory:Inventory[];prices:Price[];selectedMerchants:MerchantId[];coupon:{active:boolean;value:number;expires?:string};promotions?:Promotion[];plan:PlanLine[];history:{date:string;label:string;amount:number}[]};

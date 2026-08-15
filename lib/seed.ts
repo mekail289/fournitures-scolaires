@@ -1,11 +1,69 @@
 import {AppState,MerchantId,Supply} from "./types";
-const item=(id:string,level:Supply["level"],quantity:number,name:string,color?:string,format?:string,requirements?:string):Supply=>({id,level,quantity,name,color,format,requirements,status:"À acheter"});
+const I=(id:string,level:Supply["level"],quantity:number,name:string,color?:string,format?:string,requirements?:string):Supply=>({id,level,quantity,name,color,format,requirements,status:"À acheter"});
 export const merchants:{id:MerchantId;name:string;color:string}[]=[{id:"jean-coutu",name:"Jean Coutu",color:"#e83e4d"},{id:"bureau-en-gros",name:"Bureau en Gros",color:"#d71920"},{id:"commande-scolaire",name:"Commande Scolaire",color:"#2463a7"}];
 export const seedItems:Supply[]=[
- item("2-cah-b", "2e année",2,"Cahier ½ interligné","bleu","23,2 × 18,1 cm","Format et réglure obligatoires"),item("2-cah-v","2e année",2,"Cahier ½ interligné","vert","23,2 × 18,1 cm","Format et réglure obligatoires"),item("2-duo-b","2e année",2,"Duo-tang","bleu"),item("2-duo-r","2e année",2,"Duo-tang","rouge"),item("2-duo-v","2e année",2,"Duo-tang","vert"),item("2-hb","2e année",12,"Crayon de plomb HB"),item("2-colle","2e année",2,"Bâton de colle","","40 g"),item("2-eff","2e année",2,"Efface blanche"),item("2-color","2e année",1,"Crayons de couleur","","boîte de 24"),item("2-case","2e année",1,"Étui à crayons"),
- item("4-cah","4e année",4,"Cahier ligné","","27,6 × 21,3 cm","Réglure 0,7 cm obligatoire"),item("4-hb","4e année",24,"Crayon de plomb HB"),item("4-pocket","4e année",1,"Pochette translucide","","format lettre","Bouton-pression obligatoire"),item("4-duo-b","4e année",3,"Duo-tang","bleu"),item("4-duo-r","4e année",3,"Duo-tang","rouge"),item("4-duo-v","4e année",2,"Duo-tang","vert"),item("4-glue","4e année",2,"Bâton de colle","","40 g"),item("4-marker","4e année",2,"Surligneur"),item("4-rule","4e année",1,"Règle métrique","","30 cm"),
- item("6-cah","6e année",8,"Cahier ligné","","27,6 × 21,3 cm","Réglure 0,7 cm obligatoire"),item("6-grid","6e année",2,"Cahier quadrillé","","27,6 × 21,3 cm","Quadrillage 0,5 cm obligatoire"),item("6-duo-b","6e année",3,"Duo-tang","bleu"),item("6-duo-r","6e année",2,"Duo-tang","rouge"),item("6-duo-v","6e année",2,"Duo-tang","vert"),item("6-hb","6e année",24,"Crayon de plomb HB"),item("6-pen","6e année",4,"Stylo","bleu"),item("6-binder","6e année",1,"Cartable à anneaux","","1½ po"),item("6-ex","6e année",1,"Cahier d’exercices avec ISBN","","ISBN à confirmer","Édition obligatoire")
+I("2-01","2e année",2,"Cahier 1/2 interligné pointillé, 1/2 uni","bleu","23,2 × 18,1 cm · 32 pages"),
+I("2-02","2e année",1,"Cahier à dessin",undefined,"22,8 × 30,4 cm · 30 feuilles"),
+I("2-03v","2e année",2,"Cahier interligné pointillé","vert","23,2 × 18,1 cm · 32 à 40 pages"),
+I("2-03j","2e année",2,"Cahier interligné pointillé","jaune","23,2 × 18,1 cm · 32 à 40 pages"),
+I("2-04","2e année",1,"Cahier quadrillé broché métrique","orange","23,2 × 18,1 cm · 32 pages"),
+I("2-05","2e année",1,"Cartable avec pochettes",undefined,"1 pouce"),
+I("2-06","2e année",50,"Carton","couleurs vives","format lettre"),
+I("2-07","2e année",1,"Ciseaux à bout pointu",undefined,undefined,"Droitier ou gaucher"),
+I("2-08","2e année",2,"Colle en bâton solide","blanche","40 g et plus"),
+I("2-09","2e année",4,"Crayon-feutre effaçable à sec","noir","pointe fine"),
+I("2-10","2e année",1,"Crayons à mine en bois HB",undefined,"boîte de 24","Taillés"),
+I("2-11","2e année",1,"Crayons de couleur en bois",undefined,"boîte de 24","Taillés"),
+I("2-12","2e année",1,"Crayons marqueurs lavables",undefined,"pointe large · boîte de 24"),
+...["rose","mauve","vert","bleu","noir"].map((c,i)=>I("2-13"+i,"2e année",1,"Duo-tang en plastique à 3 crampons",c)),
+I("2-14","2e année",1,"Duo-tang en plastique à 3 crampons et 2 pochettes","blanc"),
+I("2-15","2e année",2,"Étui à crayons souple"),I("2-16","2e année",3,"Gomme à effacer"),
+I("2-17","2e année",1,"Pochette en plastique avec fermeture velcro","translucide","3 trous · format lettre"),
+I("2-18","2e année",10,"Pochette protectrice",undefined,"3 trous · format lettre","Insertion vers le haut, type épais (ex. 3,3 mm)"),
+I("2-19","2e année",1,"Règle transparente flexible",undefined,"30 cm"),
+I("2-20","2e année",1,"Séparateurs à onglets",undefined,"paquet de 5","Pour reliure à 3 anneaux"),
+I("2-21b","2e année",1,"Surligneur","bleu"),I("2-21j","2e année",1,"Surligneur","jaune"),
+I("2-22","2e année",1,"Taille-crayons avec réceptacle"),
+I("2-23","2e année",1,"Boîte ou sac à lunch"),I("2-24","2e année",1,"Bouteille d’eau réutilisable",undefined,undefined,"Identifiée"),
+I("2-25","2e année",1,"Écouteurs",undefined,undefined,"L’école peut les fournir; achat possible pour l’hygiène"),
+I("2-26","2e année",1,"Sac à dos"),I("2-27","2e année",2,"Souliers de course",undefined,undefined,"Non marquants · 1 paire intérieure et 1 extérieure · dans un sac"),
+I("2-28","2e année",1,"Vêtements de rechange"),I("2-29","2e année",1,"Vêtements de sport",undefined,undefined,"Short/pantalon/collant et chandail à manches courtes"),
+I("2-30","2e année",1,"Cahier d’exercices Pomélo A & B",undefined,"ISBN 9998202210697","Chenelière éducation"),
+I("2-31","2e année",1,"Cahier d’exercices Kiwi A & B",undefined,"ISBN 9998202210758","Chenelière éducation"),
+I("2-32","2e année",1,"Cahier d’exercices Lory, grade 2",undefined,"ISBN 9782766216062","Éditions CEC"),
+
+I("4-01","4e année",4,"Cahier ligné broché à 3 trous",undefined,"0,7 cm · 27,6 × 21,3 cm · 32 pages","Cahier Canada"),
+I("4-02","4e année",1,"Ciseaux à bout pointu"),I("4-03","4e année",1,"Colle en bâton solide",undefined,"40 g et plus"),
+I("4-04","4e année",1,"Crayon à l’encre","couleur au choix"),I("4-05","4e année",24,"Crayon à mine en bois HB",undefined,"à l’unité","Taillés"),
+I("4-06","4e année",1,"Crayons de couleur en bois",undefined,"boîte de 24"),I("4-07","4e année",1,"Crayons marqueurs lavables",undefined,"boîte de 24"),
+I("4-08n","4e année",1,"Duo-tang en plastique souple","noir",undefined,"Musique"),I("4-08b","4e année",1,"Duo-tang en plastique souple","bleu",undefined,"Anglais"),I("4-08v","4e année",6,"Duo-tang en plastique souple","couleurs variées"),
+I("4-09","4e année",2,"Étui à crayons souple"),I("4-10","4e année",3,"Gomme à effacer","blanche"),
+I("4-11","4e année",1,"Pochette facteur translucide avec bouton-pression",undefined,"3 trous · format lettre","Fermée sur 3 côtés"),
+I("4-12","4e année",1,"Règle",undefined,"30 cm"),I("4-13","4e année",1,"Séparateurs à onglets",undefined,"paquet de 5","Pour reliure à 3 anneaux"),
+I("4-14","4e année",3,"Surligneur","couleurs variées"),I("4-15","4e année",1,"Taille-crayons avec réceptacle"),
+I("4-16","4e année",1,"Boîte ou sac à lunch"),I("4-17","4e année",1,"Bouteille d’eau réutilisable",undefined,undefined,"Identifiée"),
+I("4-18","4e année",1,"Flûte à bec",undefined,undefined,"L’école peut la fournir; achat possible pour l’hygiène"),I("4-19","4e année",1,"Sac à dos"),
+I("4-20","4e année",2,"Souliers de course à lacets",undefined,undefined,"Non marquants"),I("4-21","4e année",1,"Vêtements de sport",undefined,undefined,"Short/pantalon/collant et chandail à manches courtes"),
+I("4-22","4e année",1,"Cahier d’exercices Terminus 4e + accès numérique",undefined,"ISBN 9782765073932","Chenelière éducation"),
+I("4-23","4e année",1,"Cahier d’exercices Whiz Kids, grade 4",undefined,"ISBN 9782765083764","Chenelière éducation"),
+I("4-24","4e année",1,"Cahier d’exercices Jazz 4e + accès numérique",undefined,"ISBN 9998202410110","Chenelière éducation"),
+I("4-25","4e année",1,"Cahier d’exercices Matcha 4e + accès numérique",undefined,"ISBN 9998202410196","Chenelière éducation"),
+
+I("6-01","6e année",8,"Cahier ligné broché à 3 trous",undefined,"0,7 cm · 27,6 × 21,3 cm · 32 pages"),
+I("6-02","6e année",2,"Cahier quadrillé broché",undefined,"0,5 cm · 27,6 × 21,2 cm · 40 pages"),
+I("6-03","6e année",1,"Cartable",undefined,"1 pouce"),I("6-04","6e année",1,"Ciseaux à bout pointu"),
+I("6-05","6e année",2,"Colle en bâton solide","blanche","35 à 40 g"),I("6-06b","6e année",1,"Crayon à l’encre","bleu"),I("6-06r","6e année",1,"Crayon à l’encre","rouge"),
+I("6-07","6e année",12,"Crayon à mine en bois HB",undefined,"à l’unité","Ou 1 pousse-mine avec mines; crayons taillés"),
+I("6-08","6e année",1,"Crayon marqueur permanent","noir","pointe extra-fine"),I("6-09","6e année",2,"Crayon-feutre effaçable à sec","noir","pointe fine"),
+I("6-10","6e année",1,"Crayons de couleur en bois",undefined,"boîte de 24"),I("6-11","6e année",1,"Crayons marqueurs lavables",undefined,"pointe large · boîte de 16"),
+...[["rouge",""],["vert",""],["orange",""],["mauve",""],["blanc",""],["noir","Musique"],["bleu","Anglais"]].map(([c,n],i)=>I("6-12"+i,"6e année",1,"Duo-tang en plastique à 3 crampons",c,undefined,n||undefined)),
+I("6-13","6e année",2,"Étui à crayons souple"),I("6-14","6e année",3,"Gomme à effacer","blanche"),
+I("6-15","6e année",10,"Pochette en plastique translucide",undefined,"3 trous · format lettre","Fermée sur 3 côtés"),
+I("6-16","6e année",1,"Règle",undefined,"15 cm"),I("6-17","6e année",4,"Surligneur","couleurs variées"),I("6-18","6e année",1,"Tablette de papier à dessin"),I("6-19","6e année",1,"Taille-crayons avec réceptacle"),
+I("6-20","6e année",1,"Boîte ou sac à lunch"),I("6-21","6e année",1,"Bouteille d’eau réutilisable",undefined,undefined,"Identifiée"),I("6-22","6e année",1,"Sac à dos"),
+I("6-23","6e année",2,"Souliers de course à lacets",undefined,undefined,"Non marquants · 1 paire intérieure et 1 extérieure"),I("6-24","6e année",1,"Vêtements de sport",undefined,undefined,"Pantalon court et chandail à manches courtes"),
+I("6-25","6e année",1,"Cahier d’exercices Free Agents, grade 6",undefined,"ISBN 9782765090069","Anglais"),I("6-26","6e année",1,"Cahier d’exercices Escales 6e",undefined,"ISBN 9782766155231"),
+I("6-27","6e année",1,"Cahier d’exercices Les inséparables 6e",undefined,"ISBN 9998202010037"),I("6-28","6e année",1,"Cahier d’exercices Les irréductibles 6e",undefined,"ISBN 9998202411292")
 ];
-seedItems.find(x=>x.id==="6-ex")!.mandatoryMerchant="commande-scolaire";
-const priceFor=(x:Supply,m:MerchantId,i:number)=>({itemId:x.id,merchantId:m,packagePrice:Number((1.19+(i%7)*.72+(m==="commande-scolaire"?.35:m==="bureau-en-gros"?.1:0)).toFixed(2)),packageQuantity:x.name.includes("Crayon de plomb")?12:1,available:true});
-export const initialState:AppState={items:seedItems,inventory:[{id:"inv1",name:"Crayon de plomb HB",quantity:18},{id:"inv2",name:"Duo-tang",color:"bleu",quantity:3},{id:"inv3",name:"Bâton de colle",format:"40 g",quantity:1}],prices:seedItems.flatMap((x,i)=>merchants.map(m=>priceFor(x,m.id,i))),selectedMerchants:merchants.map(x=>x.id),coupon:{active:true,value:10},plan:[],history:[]};
+const priceFor=(x:Supply,m:MerchantId,i:number)=>({itemId:x.id,merchantId:m,packagePrice:Number((1.19+(i%7)*.72+(m==="commande-scolaire"?.35:m==="bureau-en-gros"?.1:0)).toFixed(2)),packageQuantity:x.name.includes("Crayon à mine")?12:1,available:true});
+export const initialState:AppState={items:seedItems,inventory:[],prices:seedItems.flatMap((x,i)=>merchants.map(m=>priceFor(x,m.id,i))),selectedMerchants:merchants.map(x=>x.id),coupon:{active:true,value:10},promotions:merchants.map(m=>({merchantId:m.id,code:"",active:false,kind:"fixed",value:0})),plan:[],history:[]};
