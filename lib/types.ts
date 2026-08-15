@@ -7,5 +7,5 @@ export type Price={itemId:string;merchantId:MerchantId;packagePrice:number;packa
 export type PlanLine={item:Supply;merchantId:MerchantId;packages:number;cost:number;needed:number;checked?:boolean};
 export type Strategy="cheap"|"few"|"balanced";
 export type Promotion={merchantId:MerchantId;code:string;active:boolean;kind:"fixed"|"percent";value:number;expires?:string};
-export type MerchantSetting={merchantId:MerchantId;mode:"store"|"online";branch?:string;shippingFee:number;freeShippingThreshold?:number};
+export type MerchantSetting={merchantId:MerchantId;mode:"store"|"online"|"auto"|"shop"|"pickup"|"delivery";branch?:string;postalCode?:string;shippingFee:number;pickupFee?:number;travelCost?:number;freeShippingThreshold?:number;feeNote?:string};
 export type AppState={items:Supply[];inventory:Inventory[];prices:Price[];selectedMerchants:MerchantId[];coupon:{active:boolean;value:number;expires?:string};promotions?:Promotion[];merchantSettings?:MerchantSetting[];plan:PlanLine[];history:{date:string;label:string;amount:number}[]};
