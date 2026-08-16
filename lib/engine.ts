@@ -3,12 +3,13 @@ import {AppState,Inventory,MerchantId,PlanLine,Strategy,Supply} from "./types";
 export function inventoryUsed(item:Supply,inventory:Inventory[]){return inventory.filter(x=>x.name.toLowerCase()===item.name.toLowerCase()&&(!item.color||x.color?.toLowerCase()===item.color.toLowerCase())&&(!item.format||x.format?.toLowerCase()===item.format.toLowerCase())).reduce((n,x)=>n+x.quantity,0)}
 export function missing(item:Supply,inventory:Inventory[],allItems:Supply[]=[item]){if(["Acheté","Commandé","J’en ai déjà"].includes(item.status))return 0;const compatible=(x:Supply)=>x.name.toLowerCase()===item.name.toLowerCase()&&(!item.color||x.color?.toLowerCase()===item.color.toLowerCase())&&(!item.format||x.format?.toLowerCase()===item.format.toLowerCase());const index=allItems.findIndex(x=>x.id===item.id);const allocated=allItems.slice(0,index<0?0:index).filter(compatible).filter(x=>!["Acheté","Commandé","J’en ai déjà"].includes(x.status)).reduce((n,x)=>n+x.quantity,0);const fromInventory=Math.max(0,inventoryUsed(item,inventory)-allocated);return Math.max(0,item.quantity-(item.owned||0)-fromInventory)}
 export function isOptimizableSupply(item:Supply){const name=item.name.toLowerCase();return !["boîte ou sac à lunch","bouteille d’eau réutilisable","écouteurs","sac à dos","souliers","vêtements"].some(term=>name.includes(term))}
+function priceIsCurrent(price:AppState["prices"][number]){return !price.validUntil||new Date(price.validUntil+"T23:59:59")>=new Date()}
 
 export function optimize(state:AppState,strategy:Strategy,avoidStoreCost=10):PlanLine[]{
  const grouped=new Map<string,{itemIds:string[];item:Supply;price:AppState["prices"][number]}>();
  state.items.forEach(item=>{
   if(!isOptimizableSupply(item)||missing(item,state.inventory,state.items)<=0)return;
-  state.prices.filter(p=>p.itemId===item.id&&p.available&&(!!p.verifiedAt||p.matchStatus==="candidate")&&p.matchStatus!=="rejected"&&state.selectedMerchants.includes(p.merchantId)&&(!item.mandatoryMerchant||p.merchantId===item.mandatoryMerchant)).forEach(price=>{
+  state.prices.filter(p=>p.itemId===item.id&&p.available&&priceIsCurrent(p)&&(!!p.verifiedAt||p.matchStatus==="candidate")&&p.matchStatus!=="rejected"&&state.selectedMerchants.includes(p.merchantId)&&(!item.mandatoryMerchant||p.merchantId===item.mandatoryMerchant)).forEach(price=>{
    const offerKey=[price.merchantId,price.productName||item.name,price.packagePrice,price.packageQuantity,price.sourceUrl||""].join("|");
    const existing=grouped.get(offerKey);
    if(existing){if(!existing.itemIds.includes(item.id))existing.itemIds.push(item.id)}else grouped.set(offerKey,{itemIds:[item.id],item,price});
