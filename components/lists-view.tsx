@@ -15,9 +15,9 @@ export default function ListsView({state,level,setLevel,update,openImport,saveNo
  const levelTitle=level==="Combinée"?"Liste combinée":level==="Extras"?"Extras":level;
  const addExtra=()=>{if(!extraName||typeof extraQty!=="number"||extraQty<1)return;update("__extra__",{name:extraName,quantity:extraQty});setExtraName("");setExtraQty("")};
  const confirmSave=async()=>{await saveNow();setJustSaved(true);setTimeout(()=>setJustSaved(false),1800)};
- const printList=()=>{const previous=document.title;document.title=`Mon cartable - ${levelTitle}`;window.print();setTimeout(()=>{document.title=previous},1000)};
+ const printList=()=>{const previous=document.title;document.title=`Mon magasinage scolaire - ${levelTitle}`;window.print();setTimeout(()=>{document.title=previous},1000)};
  return <>
-  <div className="printOnly printHeader"><h1>Mon cartable - {levelTitle}</h1><p>Fournitures scolaires</p></div>
+  <div className="printOnly printHeader"><h1>Mon magasinage scolaire - {levelTitle}</h1><p>Fournitures scolaires</p></div>
   <div className="row spread noPrint"><h2>{level==="Extras"?"Extras pour l’année":level==="Combinée"?"Liste combinée":`Liste - ${levelTitle}`}</h2><button className="secondary" onClick={openImport}><Upload size={17}/>Importer</button></div>
   <div className="tabs noPrint">{(["Combinée","2e année","4e année","6e année","Extras"] as const).map(x=><button key={x} className={level===x?"":"ghost"} onClick={()=>setLevel(x)}>{x}</button>)}</div>
   {level==="Extras"&&<div className="card noPrint"><div className="notice">Choisissez un article dans la liste, puis indiquez la quantité supplémentaire désirée.</div><div className="field"><label>Article supplémentaire</label><select value={extraName} onChange={e=>setExtraName(e.target.value)}><option value="">Choisir un article</option>{suggestions.map(name=><option value={name} key={name}>{name}</option>)}</select></div><div className="field"><label>Quantité supplémentaire</label><div className="row"><input aria-label="Quantité supplémentaire" type="number" inputMode="numeric" min="1" placeholder="0" value={extraQty} onFocus={e=>e.currentTarget.select()} onChange={e=>setExtraQty(e.target.value===""?"":Math.max(1,+e.target.value))}/><button disabled={!extraName||extraQty===""} onClick={addExtra}><Plus/>Ajouter</button></div></div></div>}
