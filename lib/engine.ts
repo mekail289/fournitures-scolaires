@@ -25,8 +25,45 @@ export function optimize(state:AppState,strategy:Strategy,avoidStoreCost=10):Pla
  return plans.sort((a,b)=>a.score-b.score)[0]?.lines||[];
 }
 
-function cheapest(choices:PlanLine[]){const by=new Map<string,PlanLine>();choices.forEach(c=>{const group=(c.itemIds||[c.item.id]).slice().sort().join("|");const old=by.get(group);if(!old||c.cost<old.cost)by.set(group,c)});return [...by.values()]}
+function cheapest(choices:PlanLine[]){
+ const pending=new Set(choices.flatMap(x=>x.itemIds||[x.item.id])),result:PlanLine[]=[];
+ while(pending.size){
+  const first=pending.values().next().value as string,componentIds=new Set([first]),componentChoices=new Set<PlanLine>();
+  let changed=true;
+  while(changed){
+   changed=false;
+   for(const choice of choices){
+    const ids=choice.itemIds||[choice.item.id];
+    if(!ids.some(id=>componentIds.has(id)))continue;
+    if(!componentChoices.has(choice)){componentChoices.add(choice);changed=true}
+    for(const id of ids)if(!componentIds.has(id)){componentIds.add(id);changed=true}
+   }
+  }
+  for(const id of componentIds)pending.delete(id);
+  const ids=[...componentIds],offers=[...componentChoices];
+  if(ids.length<=20){
+   const positions=new Map(ids.map((id,index)=>[id,index])),full=(1<<ids.length)-1,dp=new Array<{cost:number;lines:PlanLine[]} | undefined>(full+1);
+   dp[0]={cost:0,lines:[]};
+   for(let mask=0;mask<=full;mask++){
+    const current=dp[mask];if(!current)continue;
+    for(const offer of offers){
+     const offerMask=(offer.itemIds||[offer.item.id]).reduce((value,id)=>value|(1<<(positions.get(id)??0)),0),next=mask|offerMask,cost=current.cost+offer.cost;
+     if(next===mask)continue;
+     if(!dp[next]||cost<dp[next]!.cost)dp[next]={cost,lines:[...current.lines,offer]};
+    }
+   }
+   result.push(...(dp[full]?.lines||[]));
+  }else{
+   const uncovered=new Set(ids);
+   while(uncovered.size){
+    const best=offers.filter(x=>(x.itemIds||[x.item.id]).some(id=>uncovered.has(id))).sort((a,b)=>a.cost/Math.max(1,(a.itemIds||[a.item.id]).filter(id=>uncovered.has(id)).length)-b.cost/Math.max(1,(b.itemIds||[b.item.id]).filter(id=>uncovered.has(id)).length))[0];
+    if(!best)break;result.push(best);for(const id of best.itemIds||[best.item.id])uncovered.delete(id);
+   }
+  }
+ }
+ return result;
+}
 export function couponDiscount(lines:PlanLine[],state:AppState){return state.coupon.active&&lines.some(x=>x.merchantId==="commande-scolaire")?Math.min(state.coupon.value,lines.filter(x=>x.merchantId==="commande-scolaire").reduce((n,x)=>n+x.cost,0)):0}
-function promotionValue(p:NonNullable<AppState["promotions"]>[number],subtotal:number,state:AppState){if(!p.active||subtotal<=0)return 0;if(p.expires&&new Date(p.expires+"T23:59:59")<new Date())return 0;if(p.onlineOnly){const mode=(state.merchantSettings||[]).find(x=>x.merchantId===p.merchantId)?.mode;if(mode==="shop"||mode==="store")return 0}if(p.tiers?.length){const tier=p.tiers.filter(x=>subtotal>=x.minSpend).sort((a,b)=>b.value-a.value)[0];return tier?Math.min(tier.value,subtotal):0}if(!p.code||p.value<=0||subtotal<(p.minSpend||0))return 0;const discount=p.kind==="percent"?subtotal*Math.min(p.value,100)/100:p.value;return Math.min(discount,subtotal)}export function promotionForMerchant(lines:PlanLine[],state:AppState,merchantId:MerchantId){const subtotal=lines.filter(x=>x.merchantId===merchantId).reduce((n,x)=>n+x.cost,0),offers=(state.promotions||[]).filter(p=>p.active&&p.merchantId===merchantId).map(p=>{const discount=promotionValue(p,subtotal,state);const tier=p.tiers?.filter(x=>subtotal>=x.minSpend).sort((a,b)=>b.value-a.value)[0];return{code:tier?.code||p.code,discount}}).filter(x=>x.discount>0).sort((a,b)=>b.discount-a.discount);return offers[0]||{code:"",discount:0}}export function promotionDiscount(lines:PlanLine[],state:AppState){const promotions=(state.promotions||[]).filter(p=>p.active),merchantIds=[...new Set(promotions.map(p=>p.merchantId))];return merchantIds.reduce((total,merchantId)=>{const subtotal=lines.filter(x=>x.merchantId===merchantId).reduce((n,x)=>n+x.cost,0),offers=promotions.filter(p=>p.merchantId===merchantId),discounts=offers.map(p=>promotionValue(p,subtotal,state));return total+(offers.some(p=>p.exclusive)?Math.max(0,...discounts):discounts.reduce((n,x)=>n+x,0))},0)}export function fulfillmentOption(lines:PlanLine[],state:AppState,merchantId:MerchantId){const s=(state.merchantSettings||[]).find(x=>x.merchantId===merchantId),subtotal=lines.filter(x=>x.merchantId===merchantId).reduce((n,x)=>n+x.cost,0);if(!s)return{mode:"shop" as const,label:"Magasinage en personne",cost:0};const raw=s.mode==="online"?"delivery":s.mode==="store"?"shop":s.mode,delivery=s.freeShippingThreshold&&subtotal>=s.freeShippingThreshold?0:s.shippingFee,pickup=s.pickupFee||0,options=[{mode:"delivery" as const,label:"Livraison à domicile",cost:delivery},{mode:"pickup" as const,label:"Ramassage en magasin",cost:pickup},{mode:"shop" as const,label:"Magasinage en personne",cost:0}];return raw==="auto"?options.sort((a,b)=>a.cost-b.cost)[0]:options.find(x=>x.mode===raw)||options[2]}
+export function promotionDiscount(lines:PlanLine[],state:AppState){return (state.promotions||[]).filter(p=>p.active&&p.code&&p.value>0).reduce((total,p)=>{const subtotal=lines.filter(x=>x.merchantId===p.merchantId).reduce((n,x)=>n+x.cost,0);const discount=p.kind==="percent"?subtotal*Math.min(p.value,100)/100:p.value;return total+Math.min(discount,subtotal)},0)}
+export function fulfillmentOption(lines:PlanLine[],state:AppState,merchantId:MerchantId){const s=(state.merchantSettings||[]).find(x=>x.merchantId===merchantId),subtotal=lines.filter(x=>x.merchantId===merchantId).reduce((n,x)=>n+x.cost,0);if(!s)return{mode:"shop" as const,label:"Magasinage en personne",cost:0};const raw=s.mode==="online"?"delivery":s.mode==="store"?"shop":s.mode,delivery=s.freeShippingThreshold&&subtotal>=s.freeShippingThreshold?0:s.shippingFee,pickup=s.pickupFee||0,options=[{mode:"delivery" as const,label:"Livraison à domicile",cost:delivery},{mode:"pickup" as const,label:"Ramassage en magasin",cost:pickup},{mode:"shop" as const,label:"Magasinage en personne",cost:0}];return raw==="auto"?options.sort((a,b)=>a.cost-b.cost)[0]:options.find(x=>x.mode===raw)||options[2]}
 export function shippingTotal(lines:PlanLine[],state:AppState){return [...new Set(lines.map(x=>x.merchantId))].reduce((total,id)=>total+fulfillmentOption(lines,state,id).cost,0)}
-
