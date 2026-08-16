@@ -9,9 +9,10 @@ export function optimize(state:AppState,strategy:Strategy,avoidStoreCost=10):Pla
  const grouped=new Map<string,{itemIds:string[];item:Supply;price:AppState["prices"][number]}>();
  state.items.forEach(item=>{
   if(!isOptimizableSupply(item)||missing(item,state.inventory,state.items)<=0)return;
-  const matchingSchoolItems=item.level==="Extras"?state.items.filter(source=>source.level!=="Extras"&&source.name.toLowerCase()===item.name.toLowerCase()&&(!item.format||source.format?.toLowerCase()===item.format.toLowerCase())):[];
+  const matchingSchoolItems=item.level==="Extras"?state.items.filter(source=>source.level!=="Extras"&&source.name.toLowerCase()===item.name.toLowerCase()):[];
   const priceItemIds=matchingSchoolItems.length?new Set(matchingSchoolItems.map(source=>source.id)):new Set([item.id]);
-  state.prices.filter(p=>priceItemIds.has(p.itemId)&&p.available&&priceIsCurrent(p)&&(!!p.verifiedAt||p.matchStatus==="candidate")&&p.matchStatus!=="rejected"&&state.selectedMerchants.includes(p.merchantId)&&(!item.mandatoryMerchant||p.merchantId===item.mandatoryMerchant)).forEach(price=>{
+  const requestedCount=item.level==="Extras"?item.format?.match(/\d+/)?.[0]:undefined;
+  state.prices.filter(p=>{const source=matchingSchoolItems.find(x=>x.id===p.itemId),sameCount=!requestedCount||source?.format?.includes(requestedCount)||p.productName?.includes(requestedCount);return priceItemIds.has(p.itemId)&&sameCount&&p.available&&priceIsCurrent(p)&&(!!p.verifiedAt||p.matchStatus==="candidate")&&p.matchStatus!=="rejected"&&state.selectedMerchants.includes(p.merchantId)&&(!item.mandatoryMerchant||p.merchantId===item.mandatoryMerchant)}).forEach(price=>{
    const offerKey=[price.merchantId,price.productName||item.name,price.packagePrice,price.packageQuantity,price.sourceUrl||""].join("|");
    const existing=grouped.get(offerKey);
    if(existing){if(!existing.itemIds.includes(item.id))existing.itemIds.push(item.id)}else grouped.set(offerKey,{itemIds:[item.id],item,price});
